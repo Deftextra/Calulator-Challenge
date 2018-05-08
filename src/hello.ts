@@ -1,13 +1,19 @@
 import * as ko from "knockout";
 
-class HelloViewModel {
-    language: KnockoutObservable<string>
-    framework: KnockoutObservable<string>
+namespace Calculator { 
+    
+    export class ViewModel { 
+        inputExpression = ko.observable("")
+        outputResult = ko.observable("")
 
-    constructor(language: string, framework: string) {
-        this.language = ko.observable(language);
-        this.framework = ko.observable(framework);
+        calculate (): void  { 
+            alert("hello you pressed calculate"); 
+            let inputCalc = this.inputExpression(); 
+            this.outputResult(inputCalc + "hello"); 
+            
+        }
     }
 }
 
-ko.applyBindings(new HelloViewModel("TypeScript", "Knockout"));
+ko.applyBindings(new Calculator.ViewModel()); 
+ 

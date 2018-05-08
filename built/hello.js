@@ -1,13 +1,22 @@
 define(["require", "exports", "knockout"], function (require, exports, ko) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var HelloViewModel = (function () {
-        function HelloViewModel(language, framework) {
-            this.language = ko.observable(language);
-            this.framework = ko.observable(framework);
-        }
-        return HelloViewModel;
-    }());
-    ko.applyBindings(new HelloViewModel("TypeScript", "Knockout"));
+    var Calculator;
+    (function (Calculator) {
+        var ViewModel = /** @class */ (function () {
+            function ViewModel() {
+                this.inputExpression = ko.observable("");
+                this.outputResult = ko.observable("");
+            }
+            ViewModel.prototype.calculate = function () {
+                alert("hello you pressed calculate");
+                var inputCalc = this.inputExpression();
+                this.outputResult(inputCalc + "hello");
+            };
+            return ViewModel;
+        }());
+        Calculator.ViewModel = ViewModel;
+    })(Calculator || (Calculator = {}));
+    ko.applyBindings(new Calculator.ViewModel());
 });
 //# sourceMappingURL=hello.js.map
