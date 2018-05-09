@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/knockout": "^3.4.54"
+    "@types/knockout": "^3.4.54",
+    "assert": "^1.4.1"
   },
   "devDependencies": {
     "typescript": "^2.3.2"
