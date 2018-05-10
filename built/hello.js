@@ -5,18 +5,19 @@ define(["require", "exports", "knockout"], function (require, exports, ko) {
     var Calculator;
     (function (Calculator) {
         //Lexer: 
-        function lexer(Calculation) {
+        function lexer(calculation) {
             var tokens = [];
             var tokenRegEx = /\s*([A-Za-z]+|[0-9]+|\S)\s*/g;
             var m;
-            while ((m = tokenRegEx.exec(Calculation)) !== null) {
+            while ((m = tokenRegEx.exec(calculation)) !== null) {
                 tokens.push(m[1]);
             }
             return tokens;
         }
+        Calculator.lexer = lexer;
         //Test function: 
         function isNumber(token) {
-            return (token !== undefined) && (token.match(/^[0-9]$/)) !== null;
+            return (token !== undefined) && (token.match(/^[0-9]+$/)) !== null;
         }
         //Parse function
         function parse(Calculation) {
@@ -27,11 +28,11 @@ define(["require", "exports", "knockout"], function (require, exports, ko) {
             }
             function consume(token) {
                 if (token !== tokens[position]) {
-                    throw "Only consume tokens at current position";
+                    throw new Error("Only consume tokens at current position");
                 }
                 position++;
             }
-            //Grammer
+            //Gramer Rules. 
             function parsePrime() {
                 var t = see();
                 if (isNumber(t)) {
@@ -39,19 +40,22 @@ define(["require", "exports", "knockout"], function (require, exports, ko) {
                     return { type: "number", value: t };
                 }
                 else if (t === "(") {
+                    //Ignore left bracket. 
                     consume(t);
+                    //Start new parsing process on expression in closed brackets. 
                     var expr = parseExpr();
                     if (see() !== ")") {
-                        alert("expected )");
-                        //needs to display error in results
-                        throw new SyntaxError("expected )");
+                        throw new SyntaxError("expected ')'");
                     }
                     consume(")");
                     return expr;
                 }
                 else {
-                    //needs to display error in results
-                    throw new SyntaxError("Error: All characters must be a number or parenthese");
+                    if (see() === '+' || see() === '-' || see() === '*' || see() === '/')
+                        throw new SyntaxError("' " + see() + "'" + "at wrong position");
+                    else {
+                        throw new SyntaxError("Token '" + see() + "' not allowed");
+                    }
                 }
             }
             function parseMul() {
@@ -78,8 +82,7 @@ define(["require", "exports", "knockout"], function (require, exports, ko) {
             }
             var result = parseExpr();
             if (position !== tokens.length) {
-                //needs to display error in results 
-                throw new SyntaxError("Wrong chracters:'" + see() + "'");
+                throw new SyntaxError("Wrong chracter:'" + see() + "'");
             }
             return result;
         }
@@ -101,7 +104,7 @@ define(["require", "exports", "knockout"], function (require, exports, ko) {
                 return Number(tree.value);
             }
             else {
-                return 0;
+                return null;
             }
         }
         Calculator.treeValue = treeValue;
@@ -111,14 +114,21 @@ define(["require", "exports", "knockout"], function (require, exports, ko) {
                 this.outputResult = ko.observable("");
             }
             ViewModel.prototype.calculate = function () {
-                var inputCalc = this.inputExpression();
+                var calcInput = this.inputExpression();
+                try {
+                    var parseTree = Calculator.parse(calcInput);
+                    var value = Calculator.treeValue(parseTree);
+                    this.outputResult(String(value));
+                }
+                catch (e) {
+                    this.outputResult(String(e));
+                }
             };
             return ViewModel;
         }());
         Calculator.ViewModel = ViewModel;
     })(Calculator || (Calculator = {}));
     var ViewModelIn = new Calculator.ViewModel();
-    var parseTree = Calculator.parse("(2 + 3)* dfdsf3 3 ");
-    console.log(Calculator.treeValue(parseTree));
+    ko.applyBindings(ViewModelIn);
 });
 //# sourceMappingURL=hello.js.map

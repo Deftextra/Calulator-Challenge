@@ -7,26 +7,25 @@ import * as ko from "knockout";
 
 namespace Calculator { 
         //Lexer: 
-        function lexer(Calculation: string): Array<string> { 
+        export function lexer(calculation: string): Array<string> { 
             let tokens: any = []; 
         
             let tokenRegEx =  /\s*([A-Za-z]+|[0-9]+|\S)\s*/g; 
         
             let m; 
         
-            while ((m = tokenRegEx.exec(Calculation)) !== null) {
+            while ((m = tokenRegEx.exec(calculation)) !== null) {
                 tokens.push(m[1]); 
             }
             return tokens; 
         }
-    
+
         //Test function: 
-        function isNumber(token: string) { 
-            return (token !== undefined) && (token.match(/^[0-9]$/)) !== null 
+        function isNumber(token: string): boolean { 
+            return (token !== undefined) && (token.match(/^[0-9]+$/)) !== null 
         }
     
         //Parse function
-    
         export function parse(Calculation: string) { 
             
             let tokens = lexer(Calculation); 
@@ -38,13 +37,13 @@ namespace Calculator {
     
             function consume(token: string): void { 
                 if (token !== tokens[position]) {
-                    throw "Only consume tokens at current position"; 
+                    throw new Error("Only consume tokens at current position");
                 }
                 position++; 
             }
     
     
-            //Grammer
+            //Gramer Rules. 
             function parsePrime(): any { 
                 let t = see();
     
@@ -53,25 +52,30 @@ namespace Calculator {
                     return {type: "number", value: t }; 
                 }
                 else if (t === "(") { 
+                    //Ignore left bracket. 
                     consume(t);
+
+                    //Start new parsing process on expression in closed brackets. 
                     var expr = parseExpr();
                     if (see() !== ")") {
-                        alert("expected )");  
-                        //needs to display error in results
-                        throw new SyntaxError("expected )");
+                        throw new SyntaxError("expected ')'");
                     }
                     consume(")");
                     return expr;
                 }
                 else {
-                    //needs to display error in results
-                    throw new SyntaxError("Error: All characters must be a number or parenthese");
+                        if (see() === '+' || see() === '-' || see() === '*'|| see() ==='/') 
+                            throw new SyntaxError("' " + see() + "'" + "at wrong position");  
+                        else { 
+                            throw new SyntaxError("Token '" + see() + "' not allowed");
+                        }
+                                
                 }
             }
 
             function parseMul() {
-                var expr = parsePrime();
-                var t = see();
+                let expr = parsePrime();
+                let t = see();
                 while (t === "*" || t === "/") {
                     consume(t);
                     var rhs = parsePrime();
@@ -96,12 +100,14 @@ namespace Calculator {
             let result = parseExpr()
 
             if (position !== tokens.length) { 
-                //needs to display error in results 
-                throw new SyntaxError("Wrong chracters:'" + see() + "'")
+               
+                throw new SyntaxError("Wrong chracter:'" + see() + "'");
             }
             return result; 
 
         }
+    
+      
     
     export function treeValue(tree: any): number { 
         if (tree.type === '+') { 
@@ -116,24 +122,32 @@ namespace Calculator {
         else if (tree.type === '/') { 
             return treeValue(tree.left)/treeValue(tree.right)
         }
-
         else if  (tree.type === 'number') { 
             return Number(tree.value); 
         }
-
         else {
-            return 0; 
+            return null; 
         }
     }
+
+   
     
     
     export class ViewModel { 
-        inputExpression = ko.observable("")
-        outputResult = ko.observable("")
+        inputExpression = ko.observable(""); 
+        outputResult = ko.observable(""); 
 
-        calculate (): void  { 
-            let inputCalc = this.inputExpression(); 
+        calculate(): void {
+            const calcInput = this.inputExpression(); 
 
+            try {
+                const parseTree = Calculator.parse(calcInput); 
+                const value = Calculator.treeValue(parseTree);
+                this.outputResult(String(value)); 
+            }
+            catch(e) { 
+                this.outputResult(String(e));  
+            }
         }
     }
 }
@@ -141,9 +155,8 @@ namespace Calculator {
 
 let ViewModelIn = new Calculator.ViewModel(); 
 
-let parseTree = Calculator.parse("(2 + 3)* dfdsf3 3 "); 
+ko.applyBindings(ViewModelIn);
 
-console.log(Calculator.treeValue(parseTree)); 
 
 
  

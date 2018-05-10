@@ -1,0 +1,42 @@
+
+.header { 
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+
+.background {
+    border-radius: 10px; 
+    background-color: grey; 
+    width: 20%; 
+    height: 55%; 
+}
+
+
+.calculator {
+
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 150px;
+    margin-left: 80px;
+}
+
+.input { 
+    border-radius: 1px; 
+    
+}
+
+.button { 
+    border-radius: 60px; 
+    margin-top: 4px;  
+}
+
+.output { 
+    font-size: 40px;
+}
+
+.resultBackground { 
+    
+    background-color: burlywood; 
+    font-size: 40px; 
+    
+}

@@ -6,24 +6,34 @@
     <title>Calculator</title>
     <script src="./externals/require.js"></script>
     <script src="./built/require-config.js"></script>
+    <link rel="stylesheet" href="src/styles.css"> 
     <script>
         require(["built/hello"]);
     </script>
 </head>
 
-<!---------------------------->
+
 
 <body>
-    <p>
-        <h1 style="color:green"> Calculator </h1>
+    <div class="background">
+        <div class="calculator">
 
+            <h1 class="header"> Calculator </h1>
 
-        <input data-bind="value: inputExpression"></input> 
+            <input data-bind="value: inputExpression" class="input" ></input> 
         
-        <button data-bind="click: calculate">Calculate</button>
+            
+            <button class="button" data-bind="click: calculate" >Calculate</button>
+        </div> 
     
-       <div> Result: <span style="size: 20px" data-bind="text: outputResult"></span> </div>
-    </p>
+    <div style="font-size: 30px; padding-left: 10px"> Result: <div>
+    
+    <div class="output" ><span data-bind="text: outputResult"></span></div>
+
+    </div>
+
+    
+    </div>
 
 </body>
 
